@@ -2,39 +2,43 @@
 # logic unit.
 
 using Flux
+using NNlib: σ_stable
 
 
 # - Neural Accumulator - #
-mutable struct NAC{S}
+struct NAC{S}
     Ŵ::S
     M̂::S
-    W::Union{S, Nothing}
 end
 
-NAC(in::Integer, out::Integer; initW = randn) = 
-    NAC(param(initW(out, in)), param(initW(out, in)), nothing)
-
-function (nac::NAC)(x)
-    nac.W = tanh.(nac.Ŵ) .* σ.(nac.M̂)
-    nac.W * x
-end
+NAC(in::Integer, out::Integer; initW = Flux.initn) = 
+    NAC(param(initW(out, in)), param(initW(out, in)))
 
 Flux.@treelike(NAC)
 
+function (nac::NAC)(x)
+    W = tanh.(nac.Ŵ) .* σ_stable.(nac.M̂)
+    return W * x
+end
+
+
 
 # - Neural Arithmetic Logic Unit - #
-struct NALU{S}
+struct NALU{S, T}
     nacₐ::NAC
     nacₘ::NAC
     G::S
+    b::T
 end
 
-NALU(in::Integer, out::Integer) = 
-    NALU(NAC(in, out), NAC(in, out), param(randn(out, in)))
+NALU(in::Integer, out::Integer; initW = Flux.initn, initb = zeros) = 
+    NALU(NAC(in, out, initW=initW), NAC(in, out, initW=initW), param(initW(out, in)), param(initb(out)))
+
+Flux.@treelike(NALU)
 
 function (nalu::NALU)(x)
     # gate
-    g = σ.(nalu.G*x)
+    g = σ_stable.(nalu.G*x .+ nalu.b)
     
     # addition
     a = nalu.nacₐ(x)
@@ -45,5 +49,3 @@ function (nalu::NALU)(x)
     # nalu
     return g .* a + (1 .- g) .* m
 end
-
-Flux.@treelike(NALU)
