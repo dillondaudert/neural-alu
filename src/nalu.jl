@@ -25,14 +25,13 @@ end
 
 # - Neural Arithmetic Logic Unit - #
 struct NALU{S, T}
-    nacₐ::NAC
-    nacₘ::NAC
+    nac::NAC
     G::S
     b::T
 end
 
 NALU(in::Integer, out::Integer; initW = Flux.initn, initb = zeros) = 
-    NALU(NAC(in, out, initW=initW), NAC(in, out, initW=initW), param(initW(out, in)), param(initb(out)))
+    NALU(NAC(in, out, initW=initW), param(initW(out, in)), param(initb(out)))
 
 Flux.@treelike(NALU)
 
@@ -41,10 +40,10 @@ function (nalu::NALU)(x)
     g = σ_stable.(nalu.G*x .+ nalu.b)
     
     # addition
-    a = nalu.nacₐ(x)
+    a = nalu.nac(x)
     
     # multiplication
-    m = exp.(nalu.nacₘ(log.(abs.(x) .+ eps())))
+    m = exp.(nalu.nac(log.(abs.(x) .+ eps())))
     
     # nalu
     return g .* a + (1 .- g) .* m
