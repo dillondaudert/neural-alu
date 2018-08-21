@@ -12,11 +12,16 @@ include("data.jl")
         
         min = 0
         max = rand(1:100)*rand()
-        val = randmgn(input_size, min, max, a_inds, b_inds)
+        ops = [+, -, *, \]
+        op = rand(ops)
+        val = randmgn(op, input_size, min, max, a_inds, b_inds)
         @test abs(sum(val[a_inds])) > min
         @test abs(sum(val[a_inds])) < max
         @test abs(sum(val[b_inds])) > min
         @test abs(sum(val[b_inds])) < max
+        yabs = abs(op(sum(val[a_inds]), sum(val[b_inds])))
+        @test yabs < max
+        @test yabs > min
     end
     
 end
