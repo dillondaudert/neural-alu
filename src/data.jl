@@ -12,11 +12,14 @@ of indices specified by these vectors.
 Returns a single vector of values.
 """
 function randmgn(input_size, min, max, a_inds, b_inds=nothing)
+    if max < min
+        error("min should be less than max in randmgn!")
+    end
     while true
         sample = rand(input_size) .* 2*max .- max
-        asum = sum(sample[a_inds])
+        asum = abs(sum(sample[a_inds]))
         if b_inds !== nothing
-            bsum = sum(sample[b_inds])
+            bsum = abs(sum(sample[b_inds]))
         end
         if asum < max && asum > min && (b_inds === nothing || (bsum < max && bsum > min))
             return sample

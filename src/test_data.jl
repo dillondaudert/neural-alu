@@ -5,7 +5,7 @@ include("data.jl")
 @testset "randmgn tests" begin
     
     for i=1:100
-        input_size = rand(1:100)
+        input_size = 15
         perm = randperm(input_size)
         a_inds = perm[1:div(input_size, 2)]
         b_inds = perm[div(input_size, 2)+1:end]
@@ -13,10 +13,10 @@ include("data.jl")
         min = 0
         max = rand(1:100)*rand()
         val = randmgn(input_size, min, max, a_inds, b_inds)
-        @test sum(val[a_inds]) > min
-        @test sum(val[a_inds]) < max
-        @test sum(val[b_inds]) > min
-        @test sum(val[b_inds]) < max
+        @test abs(sum(val[a_inds])) > min
+        @test abs(sum(val[a_inds])) < max
+        @test abs(sum(val[b_inds])) > min
+        @test abs(sum(val[b_inds])) < max
     end
     
 end
