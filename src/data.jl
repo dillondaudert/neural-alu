@@ -33,9 +33,9 @@ Generates a dataset for binary operations.
 function binary_data(bin_op,
                      num_samples::Integer,
                      input_size::Integer,
-                     mgn::Integer;
+                     max::Integer;
                      perm=nothing,
-                     min_mgn=0,
+                     min=0,
                     )
     if perm === nothing
         perm = randperm(input_size)
@@ -43,7 +43,7 @@ function binary_data(bin_op,
     a_inds = perm[1:div(input_size, 2)]
     b_inds = perm[div(input_size, 2)+1:end]
     
-    data_xs = [randmgn(input_size, min_mgn, mgn, a_inds, b_inds) for _ in 1:num_samples]
+    data_xs = [randmgn(input_size, min, max, a_inds, b_inds) for _ in 1:num_samples]
     data_abs = [(sum(x[a_inds]), sum(x[b_inds])) for x in data_xs]
     data_ys = [bin_op(a, b) for (a, b) in data_abs]
     
@@ -59,9 +59,9 @@ negative values.
 function unary_data(op,
                     num_samples::Integer,
                     input_size::Integer,
-                    mgn::Integer,
+                    max::Integer,
                     perm=nothing,
-                    min_mgn=0
+                    min=0
                     )
     if perm === nothing
         perm = randperm(input_size)
@@ -69,7 +69,7 @@ function unary_data(op,
     a_inds = perm[1:div(input_size, 2)]
     b_inds = perm[div(input_size, 2)+1:end]
     
-    data_xs = [rand(input_size) .* (2*mgn) for _ in 1:num_samples]
+    data_xs = [rand(input_size) .* (2*max) for _ in 1:num_samples]
     data_abs = [(sum(x[a_inds]), sum(x[b_inds])) for x in data_xs]
     data_ys = [op(a) for (a, _) in data_abs]
     
