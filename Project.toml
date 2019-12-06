@@ -1,0 +1,4 @@
+name = "NeuralALU"
+uuid = "f3658691-a7fb-485b-a19d-71303a47d21a"
+authors = ["Dillon Daudert <dillongdaudert@gmail.com>"]
+version = "0.1.0"
